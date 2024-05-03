@@ -1,0 +1,2 @@
+<h1>Objetivo</h1>
+<p>Este projeto consiste na implementação de um sistema de controle de quartos em um hotel utilizando estruturas de dados estáticas em C# sem a necessidade de uma base de dados. O sistema armazenará informações sobre diferentes quartos, como número de quarto, tipo de quarto, preço, status de ocupação, e permitirá realizar operações relacionadas ao usuário referente ao quarto, como inserção e remoção de atividade.</p>
