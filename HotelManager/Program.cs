@@ -13,7 +13,7 @@ namespace HotelManager
             //o programa irá fazer o gerenciamento de 15 quartos por padrão
             var qualities = new List<string> { "Economico", "Standard", "Turista", "Luxo" }; //Lista das qualidades disponiveis.
             int[] price = new int[15] {100,110,120,130,140,150,160,170,180,190,200,210,220,230,240 }; //vetor para o preço de cada quarto.
-            string[] qrooms = new string[15] { 'Turista', 'Economico', 'Luxo', 'Luxo', 'Turista', 'Luxo', 'Turista', 'Economico', 'Luxo', 'Standard', 'Luxo', 'Luxo', 'Luxo', 'Luxo', 'Economico' }; //vetor para a qualidade do quarto.
+            string[] qrooms = new string[15] { "Turista", "Economico", "Luxo", "Luxo", "Turista", "Luxo", "Turista", "Economico", "Luxo", "Standard", "Luxo", "Luxo", "Luxo", "Luxo", "Economico" }; //vetor para a qualidade do quarto.
             bool[] booked = new bool[15]; //vetor para endicar se o quarto está ocupado ou não.
             DateTime[,] time = new DateTime[15, 2]; // matriz para indicar quanto tempo um quero vai ficar ocupado.
             string op;
