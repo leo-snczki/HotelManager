@@ -1,4 +1,10 @@
-﻿using System.Reflection;
+﻿/*
+  ／l、
+（ﾟ､ ｡７
+ l、ﾞ~ヽ
+ じしf_, )ノ 
+*/
+using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -20,7 +26,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // O GUID a seguir será destinado à ID de typelib se este projeto for exposto para COM
-[assembly: Guid("58e0d1cc-8e96-43c2-8e6b-5313fd59ea6c")]
+[assembly: Guid("75a4879f-0eb4-48ff-8e3e-9e24f199c293")]
 
 // As informações da versão de um assembly consistem nos quatro valores a seguir:
 //
