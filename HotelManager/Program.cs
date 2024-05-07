@@ -8,11 +8,12 @@ namespace HotelManager
 {
     class Program
     {
+        static int[] price = new int[15] { 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240 }; //vetor para o preço de cada quarto.
+        
         static void Main(string[] args)
         {
             //o programa irá fazer o gerenciamento de 15 quartos por padrão
             var qualities = new List<string> { "Economico", "Standard", "Turista", "Luxo" }; //Lista das qualidades disponiveis.
-            int[] price = new int[15] { 100, 110, 120, 130, 140, 150, 160, 170, 180, 190, 200, 210, 220, 230, 240 }; //vetor para o preço de cada quarto.
             string[] qrooms = new string[15] { "Turista", "Economico", "Luxo", "Luxo", "Turista", "Luxo", "Turista", "Economico", "Luxo", "Standard", "Luxo", "Luxo", "Luxo", "Luxo", "Economico" }; //vetor para a qualidade do quarto.
             bool[] booked = new bool[15]; //vetor para endicar se o quarto está ocupado ou não.
             DateTime[] time = new DateTime[15]; // vetor para indicar quanto tempo um quero vai ficar ocupado.
@@ -23,7 +24,8 @@ namespace HotelManager
             {
                 AutoUnbook(ref booked, ref time);
 
-                Console.WriteLine("Insira a opção desejada: ");
+                ExibirMenu();
+                Console.Write("Insira a opção desejada: ");
                 op = Console.ReadLine();
 
                 switch (op)
@@ -34,11 +36,11 @@ namespace HotelManager
                         break;
                     case "2":
                         // Ocupar quarto
-                        BookRoom(ref booked, ref time);
+                        BookRoom(ref booked, ref time, qrooms);
                         break;
                     case "3":
                         // Desocupa o quarto
-                        UnbookRoom(ref booked, ref time);
+                        UnbookRoom(ref booked, ref time, qrooms);
                         break;
                     case "4":
                         // Encontrar quarto com menor preço, maior preço ou de certas qualidades
@@ -46,19 +48,41 @@ namespace HotelManager
                         break;
                     case "5":
                         // Editar quarto
-                        ChangeRoom(ref price, ref qrooms, qualities);
+                        ChangeRoom(ref price, ref qrooms, qualities, booked);
                         break;
                     case "6":
                         // Adicionar quarto
                         AddRoom(qualities, ref price, ref qrooms, ref time, ref booked);
                         break;
+                    case "7":
+                        // Remove quarto
+                        DelRoom(ref price, ref qrooms, ref time, ref booked);
+                        break;
+                    case "8":
+                        //Sair
+
+                        break;
                     default:
                         Console.WriteLine("Opção inválida, digite novamente.");
                         break;
                 }
-            } while (true);
+            } while (op != "8");
             Console.ReadLine();
         }
+        static void ExibirMenu()
+        {
+            Console.WriteLine("\n===== Menu =====");
+            Console.WriteLine("1. Listar todos os quartos");
+            Console.WriteLine("2. Ocupar quarto");
+            Console.WriteLine("3. Desocupar quarto");
+            Console.WriteLine("4. Encontrar quarto por menor preço ou outras qualidades");
+            Console.WriteLine("5. Editar quarto");
+            Console.WriteLine("6. Adicionar quarto");
+            Console.WriteLine("7. Remover quarto");
+            Console.WriteLine("8. Sair");
+            Console.WriteLine("================\n");
+        }
+
         static void AutoUnbook(ref bool[] booked, ref DateTime[] time)
         {
             for (int i = 0; i < booked.Length; i++)
@@ -69,9 +93,11 @@ namespace HotelManager
                 }
             }
         }
-        static void UnbookRoom(ref bool[] booked, ref DateTime[] time)
+
+        static void UnbookRoom(ref bool[] booked, ref DateTime[] time, string[] qrooms)
         {
             int i;
+            ShowRooms(qrooms, booked);
             Console.WriteLine("Qual o quarto que gostaria de remover?");
             do
             {
@@ -82,6 +108,7 @@ namespace HotelManager
             booked[i] = false;
             time = time.Where((val, idx) => idx != i).ToArray();
         }
+
         static void AddRoom(List<string> qualities, ref int[] price, ref string[] qrooms, ref DateTime[] time, ref bool[] booked)
         {
             int i;
@@ -96,6 +123,28 @@ namespace HotelManager
                 if (i <= 0) Console.WriteLine("Valor inválido tente novamente");
             } while (i <= 0);
             ChangeQuality(ref qrooms, qualities, price.Length - 1);
+        }
+
+        static void DelRoom(ref int[] price, ref string[] qrooms, ref DateTime[] time, ref bool[] booked)
+        {
+            int i2;
+            Console.Write("Selecione o quarto que quer remover: ");
+            do
+            {
+                i2 = Convert.ToInt32(Console.ReadLine());
+                if (i2 < 1 || i2 > price.Length) Console.Write("Esse quarto não existe, tente novamente: ");
+            } while (i2 < 1 || i2 > price.Length);
+            for(int i = i2; i < price.Length; i++)
+            {
+                price[i - 1] = price[i];
+                qrooms[i - 1] = qrooms[i];
+                time[i - 1] = time[i];
+                booked[i - 1] = booked[i];
+            }
+            Array.Resize(ref price, price.Length - 1);
+            Array.Resize(ref qrooms, qrooms.Length - 1);
+            Array.Resize(ref time, time.Length - 1);
+            Array.Resize(ref booked, booked.Length - 1);
         }
         
         static void SetRooms(ref int[] price, ref string[] qrooms, List<string> qualities)
@@ -117,15 +166,17 @@ namespace HotelManager
                 Console.Clear();
             }
         }
-        static void BookRoom(ref bool[] booked, ref DateTime[] time)
+
+        static void BookRoom(ref bool[] booked, ref DateTime[] time, string[] qrooms)
         {
             int i, i2;
             string check = "N";
+            ShowRooms(qrooms, booked);
             Console.WriteLine("Qual o quarto que quer marcar? \nOs quartos vão de 1 a {0}", booked.Length);
             do
             {
                 i = Convert.ToInt32(Console.ReadLine()) - 1;
-                if (i < 0 || i > booked.Length - 1) Console.WriteLine("Quarto inválida, tente novamente");
+                if (i < 0 || i > booked.Length - 1) Console.WriteLine("Quarto inválido, tente novamente");
                 if (booked[i]) Console.WriteLine("Este quarto já foi marcado, tente outro quarto");
             } while ((i < 0 || i > booked.Length - 1) || booked[i]);
             do
@@ -135,18 +186,19 @@ namespace HotelManager
                 if (i2 <= 0) Console.WriteLine("Quantidade de dias invalida, tente novamente");
                 else 
                 { 
-                Console.WriteLine("Queres mesmo reservar este quarto de {0} até {1}? \nEscreva 'S' para sim ou 'N' para não", DateTime.Now.Date.ToString("dd/MM/yyyy"), DateTime.Now.Date.AddDays((double)i2).ToString("dd/MM/yyyy"));
+                Console.WriteLine("Queres mesmo reservar este quarto de {0} até {1}? \nEscreva '1' para sim ou '2' para não", DateTime.Now.Date.ToString("dd/MM/yyyy"), DateTime.Now.Date.AddDays((double)i2).ToString("dd/MM/yyyy"));
                 check = Console.ReadLine();
                 }
-            } while (i2 <= 0 || check != "S");
+            } while (i2 <= 0 || check != "1");
             booked[i] = true;
             time[i] = DateTime.Now.Date.AddDays(i2);
         }
-        static void ChangeRoom(ref int[] price, ref string[] qrooms, List<string> qualities)
+        static void ChangeRoom(ref int[] price, ref string[] qrooms, List<string> qualities, bool[] booked)
         {
             int i;
             int nPrice;
             string input;
+            ShowRooms(qrooms, booked);
             Console.WriteLine("Que quarto que quer editar?");
             do
             {
@@ -160,17 +212,20 @@ namespace HotelManager
                 if (i <= 0 || price[i] == nPrice) Console.WriteLine("Novo preço não pode ser igual ao preço antigo, ser negativo ou ser zero, tente novamente");
             } while (i <= 0 || price[i] == nPrice);
             price[i] = nPrice;
-            Console.Write("Quer editar a qualidade do quarto? Precione 1 para editar");
-            input = Console.ReadLine();
-            switch (input)
-            {
-                case "1":
-                    ChangeQuality(ref qrooms, qualities, i);
-                    break;
-                default:
-                    break;
+            if (!booked[i]) { 
+                Console.Write("Quer editar a qualidade do quarto? \nPrecione '1' para editar");
+                input = Console.ReadLine();
+                switch (input)
+                {
+                    case "1":
+                        ChangeQuality(ref qrooms, qualities, i);
+                        break;
+                    default:
+                        break;
+                }
             }
         }
+
         static void ChangeQuality(ref string[] qrooms, List<string> qualities, int i)
         {
             string nQuality;
@@ -182,6 +237,7 @@ namespace HotelManager
             } while (!qualities.Contains(nQuality, StringComparer.Ordinal) || qrooms[i] == nQuality);
             qrooms[i] = nQuality;
         }
+
         static void FindRoom(int[] price, string[] qrooms, bool[] booked)
         {
             int[] frooms = booked.Select((b, i) => !b ? i : -1).Where(i => i != -1).ToArray();
@@ -193,22 +249,21 @@ namespace HotelManager
                 fqrooms[i] = qrooms[frooms[i]];
             }
 
-            int i2;
             string input;
-            Console.WriteLine("Escolha uma das opções. \n1 - Descobrir qual o quarto mais barato ou o mais caro disponivel \n2 - todos os quartos de uma certa qualidade disponiveis");
-            i2 = Convert.ToInt32(Console.ReadLine());
-            switch (i2)
+            Console.WriteLine("Escolha uma das opções. \n1 - Descobrir qual o quarto mais barato ou o mais caro disponivel \n2 - todos os quartos de uma certa qualidade disponiveis \nQualquer outro valor lhe levará para o menú inicial");
+            input = Console.ReadLine();
+            switch (input)
             {
-                case 1:
-                    Console.WriteLine("Qual o tipo de preço que quer descobrir? \nUse 'barato' para descobrir o quarto mais barato disponivel ou"); // Escreve a mensagem a dizer qual é o preço a pesquisar
+                case "1":
+                    Console.WriteLine("Qual o tipo de preço que quer descobrir? \nUse '1' para descobrir o quarto mais barato disponivel ou use '2' para descobrir o quarto mais caro disponivel"); // Escreve a mensagem a dizer qual é o preço a pesquisar
                     do {
                         input = Console.ReadLine();
-                        if (input == "barato") Console.WriteLine("O número do quarto mais barato é {0}, ele custa {1}", frooms[Array.IndexOf(frprice, frprice.Min())] + 1, frprice.Min());
-                        else if (input == "caro") Console.WriteLine("O número do quarto mais caro é {0}, ele custa {1}", frooms[Array.IndexOf(frprice, frprice.Max())] + 1, frprice.Max());
+                        if (input == "1") Console.WriteLine("O número do quarto mais barato é {0}, ele custa {1}", frooms[Array.IndexOf(frprice, frprice.Min())] + 1, frprice.Min());
+                        else if (input == "2") Console.WriteLine("O número do quarto mais caro é {0}, ele custa {1}", frooms[Array.IndexOf(frprice, frprice.Max())] + 1, frprice.Max());
                         else Console.WriteLine("Opção invalida, tente novamente");
-                    } while (input != "barato" && input != "caro");
+                    } while (input != "1" && input != "2");
                     break;
-                case 2:
+                case "2":
                     input = Console.ReadLine();
                     Console.WriteLine("Quartos {0}, qualidade {1}", String.Join(", ", fqrooms.Select((b, i) => b == input ? frooms[i] + 1 : -1).Where(i => i != -1).ToArray()), input);
                     break;
@@ -220,7 +275,7 @@ namespace HotelManager
         {
             for (int i = 0; i < qrooms.Length; i++)
             {
-                Console.WriteLine($"Quarto {i + 1}: {qrooms[i]}, Estado: {(booked[i] ? "Ocupado" : "Livre")}");
+                Console.WriteLine($"Quarto {i + 1}: {qrooms[i]}, Estado: {(booked[i] ? "Ocupado" : $"Livre, Preço: {price[i]}")}");
             }
         }
     }
