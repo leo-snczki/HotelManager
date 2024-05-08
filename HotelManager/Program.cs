@@ -45,7 +45,7 @@ namespace HotelManager
                         break;
                     case "4":
                         // Encontrar quarto com menor preço, maior preço ou de certas qualidades
-                        FindRoom(price, qrooms, booked);
+                        FindRoom(price, qrooms, booked, qualities);
                         break;
                     case "5":
                         // Editar quarto
@@ -119,7 +119,7 @@ namespace HotelManager
 
         static void AddRoom(List<string> qualities, ref float[] price, ref string[] qrooms, ref DateTime[] time, ref bool[] booked)
         {
-            int i;
+            float i;
             Array.Resize(ref price, price.Length + 1);
             Array.Resize(ref qrooms, qrooms.Length + 1);
             Array.Resize(ref time, time.Length + 1);
@@ -128,7 +128,7 @@ namespace HotelManager
             do
             {
                 input = Console.ReadLine();
-                Int32.TryParse(input, out i);
+                float.TryParse(input, out i);
                 if (i <= 0) Console.WriteLine("Valor inválido tente novamente");
             } while (i <= 0);
             price[price.Length - 1] = i;
@@ -262,18 +262,19 @@ namespace HotelManager
             qrooms[i] = qualities[i2 - 1];
         }
 
-        static void FindRoom(float[] price, string[] qrooms, bool[] booked)
+        static void FindRoom(float[] price, string[] qrooms, bool[] booked, List<string> qualities)
         {
-            int[] frooms = booked.Select((b, i) => !b ? i : -1).Where(i => i != -1).ToArray();
+            int[] frooms = booked.Select((b, idx) => !b ? idx : -1).Where(idx => idx != -1).ToArray();
             float[] frprice = new float[frooms.Length];
             string[] fqrooms = new string[frooms.Length];
-            for (int i = 0; i < frooms.Length; i++)
+            for (int idx = 0; idx < frooms.Length; idx++)
             {
-                frprice[i] = price[frooms[i]];
-                fqrooms[i] = qrooms[frooms[i]];
+                frprice[idx] = price[frooms[idx]];
+                fqrooms[idx] = qrooms[frooms[idx]];
             }
 
             string input;
+            int i;
             Console.WriteLine("Escolha uma das opções. \n1 - Descobrir qual o quarto mais barato ou o mais caro disponivel \n2 - todos os quartos de uma certa qualidade disponiveis \nQualquer outro valor lhe levará para o menú inicial");
             input = Console.ReadLine();
             switch (input)
@@ -289,8 +290,15 @@ namespace HotelManager
                     } while (input != "1" && input != "2");
                     break;
                 case "2":
-                    input = Console.ReadLine();
-                    Console.WriteLine("Quartos quartos disponiveis com qualidade {1}, são: {0}", String.Join(", ", fqrooms.Select((b, i) => b == input ? frooms[i] + 1 : -1).Where(i => i != -1).ToArray()), input);
+                    Console.WriteLine("Qual vai ser a qualidade? \nQualidades disponiveis: '1' para 'Economico', '2' para 'Standard', '3' para 'Turista' e '4' para 'Luxo'");
+                    do
+                    {
+                        input = Console.ReadLine();
+                        Int32.TryParse(input, out i);
+                        i--;
+                        if (i < 0 || i > 3) Console.WriteLine("O valor inserido é inválido, tente novamente");
+                    } while (i < 0 || i > 3);
+                    Console.WriteLine("Os quartos disponiveis com qualidade {1}, são: {0}", String.Join(", ", fqrooms.Select((b, idx) => b == qualities[i] ? frooms[idx] + 1 : -1).Where(idx => idx != -1).ToArray()), qualities[i]);
                     break;
                 default:
                     break;
